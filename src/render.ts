@@ -574,7 +574,7 @@ export function renderServedHtml(
   branding = true,
   bar: TopBar | null = null,
 ): Response {
-  const footer = branding ? OPENARTIFACTS_FOOTER : "";
+  const footer = ""; // Self-hosted: no "Powered by openartifacts.ai" footer.
   const head = branding ? NOINDEX_META + FAVICON_LINK + SOCIAL_CARD_META : NOINDEX_META;
   let fromCopilot = false;
   let headPlaced = false;

@@ -67,7 +67,8 @@ export function readerIsolate(response: Response): Response {
 export const hidden = (name: string, value: string) =>
   `<input type="hidden" name="${name}" value="${escapeHtml(value)}">`;
 
-const TERMS_CONSENT = `<label class="newsletter terms-consent"><input type="checkbox" name="terms" value="yes" required> <span>I agree to the <a href="https://openartifacts.ai/terms">Terms</a>. This creates your free account.</span></label>`;
+// Self-hosted: no third-party Terms to accept; the server still expects terms=yes.
+const TERMS_CONSENT = `<input type="hidden" name="terms" value="yes">`;
 
 /** An email input in the code-box style would uppercase an address on screen. */
 const EMAIL_FIELD_STYLE = "text-transform:none;letter-spacing:normal";
@@ -158,7 +159,7 @@ export function termsPage(
       title: "Create your free account",
       heading: "Create your free account.",
       message: `Continue as <b><bdi>${escapeHtml(email)}</bdi></b> to ${home ? "see your pages" : `${purpose} this document`}.`,
-      actions: `<form class="signup" method="post" action="${submit.action}">${hidden(submit.field, submit.token)}${hidden("next", next)}<p class="terms">See our <a href="https://openartifacts.ai/privacy">Privacy Policy</a>.</p>${TERMS_CONSENT}<div class="actions"><button type="submit">Create account and ${home ? "continue" : purpose}</button></div></form>`,
+      actions: `<form class="signup" method="post" action="${submit.action}">${hidden(submit.field, submit.token)}${hidden("next", next)}${TERMS_CONSENT}<div class="actions"><button type="submit">Create account and ${home ? "continue" : purpose}</button></div></form>`,
     },
     200,
   );

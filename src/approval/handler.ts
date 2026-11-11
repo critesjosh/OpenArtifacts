@@ -530,23 +530,9 @@ async function prove(
         detail: codeDetail(handshake.user_code),
         actions: `<form class="signup" method="post" action="${APPROVAL_PREFIX}/confirm">
         <input type="hidden" name="${CONFIRM_TOKEN_FIELD}" value="${confirmToken}">
-        <p class="terms">Three published documents are free. See our <a href="https://openartifacts.ai/privacy">Privacy Policy</a>.</p>
-        <label class="newsletter"><input type="checkbox" name="newsletter" value="yes" checked> <span>Send me product updates via the Brevilabs newsletter.</span></label>
-        <label class="newsletter terms-consent"><input type="checkbox" name="terms" value="yes" required> <span>I agree to the <a href="https://openartifacts.ai/terms">Terms</a>.</span></label>
-        <div class="actions"><button type="submit" disabled>Create account and approve device</button></div>
-      </form>
-      <script>
-        const signup = document.querySelector('form.signup');
-        const terms = signup.elements.namedItem('terms');
-        const updateButtons = () => {
-          for (const button of signup.querySelectorAll('button[type="submit"]')) {
-            button.disabled = !terms.checked;
-          }
-        };
-        terms.addEventListener('change', updateButtons);
-        window.addEventListener('pageshow', updateButtons);
-        updateButtons();
-      </script>`,
+        <input type="hidden" name="terms" value="yes">
+        <div class="actions"><button type="submit">Create account and approve device</button></div>
+      </form>`,
       },
       200,
     );

@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "symposium",
+  "name": "openartifacts",
   "main": "src/index.ts",
   "compatibility_date": "2026-07-24",
   "observability": {
@@ -17,19 +17,10 @@
   // must match `vars` below exactly; the router fails closed on every other
   // host once any configured hostname is present.
   "routes": [
-    { "pattern": "openartifacts.site", "custom_domain": true },
-    { "pattern": "symposium.site", "custom_domain": true },
-    { "pattern": "api.openartifacts.ai", "custom_domain": true },
-    { "pattern": "api.symposium.md", "custom_domain": true },
-    // One origin per publisher: `{label}.openartifacts.site`, the label being the
-    // first 16 bytes of SHA-256("openartifacts-origin-v1:" + docs.owner) in
-    // lowercase Crockford base32, 26 characters. A publisher's invited-only
-    // documents are served only there; a custom hostname takes the same seat
-    // later. A custom domain cannot be a wildcard, so this is a route, and it
-    // needs the proxied DNS record `*.openartifacts.site AAAA 100::` that
-    // docs/deploying.md has an operator add once. `resolveSurface` serves only a
-    // 26-character label here and fails closed on every other subdomain.
-    { "pattern": "*.openartifacts.site/*", "zone_name": "openartifacts.site" }
+    { "pattern": "qart.cc", "custom_domain": true },
+    { "pattern": "api.adjacentpossible.dev", "custom_domain": true },
+    // Private sharing: per-publisher origins. Needs a proxied `*.qart.cc AAAA 100::` record.
+    { "pattern": "*.qart.cc/*", "zone_name": "qart.cc" }
   ],
 
   // The limiter on POST /device/code, which is unauthenticated by necessity —
@@ -149,7 +140,6 @@
   // `EMAIL_FROM`, and on the free plan deletes this block and `EMAIL_FROM`
   // altogether. Optional: a deployment without it sends no email and offers no
   // code sign-in, and Google and GitHub still work.
-  "send_email": [{ "name": "EMAIL", "allowed_sender_addresses": ["share@mail.openartifacts.ai"] }],
 
   // The Worker version that is running. A served page's validator carries its
   // deploy time (see `renderingSuffix` in src/serve.ts), so every deploy counts
@@ -159,7 +149,7 @@
   "version_metadata": { "binding": "CF_VERSION_METADATA" },
 
   // R2 is the system of record: every served byte lives here.
-  "r2_buckets": [{ "binding": "DOCS", "bucket_name": "symposium-docs" }],
+  "r2_buckets": [{ "binding": "DOCS", "bucket_name": "openartifacts-docs" }],
 
   // D1 holds pointer rows only (ids, sizes, timestamps) and is rebuildable
   // from R2. `database_id` is the real database, created 2026-07-25 in region
@@ -168,8 +158,8 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "symposium",
-      "database_id": "59bdf562-6ffb-4e2e-a5b5-dc40f6f30bdc",
+      "database_name": "openartifacts",
+      "database_id": "10dd9282-a987-4c27-adca-0a410092ff2e",
       "migrations_dir": "migrations"
     }
   ],
@@ -206,24 +196,10 @@
   // one-deploy cutover. Record its version as the rollback floor; older versions
   // would route the new hosts by path and make api.symposium.md live again.
   "vars": {
-    "SERVING_HOST": "openartifacts.site",
-    "API_HOST": "api.openartifacts.ai",
-    "LEGACY_SERVING_HOST": "symposium.site",
-    "RETIRED_API_HOST": "api.symposium.md",
+    "SERVING_HOST": "qart.cc",
+    "API_HOST": "api.adjacentpossible.dev",
     "DEFAULT_PLAN": "free",
-    "ACCOUNT_ACTION_URL": "https://openartifacts.ai/account",
-    "UPGRADE_URL": "https://openartifacts.ai/account",
-    "EMAIL_FROM": "share@mail.openartifacts.ai",
-    // Every paid plan includes private sharing, so `privateSharing` is on both
-    // `pro` and `pro_lifetime` and absent from `free`. The license-key side has
-    // no flag: any plan that may publish with a key (PUBLISHING_PLANS in
-    // src/auth.ts) may share privately.
-    "PLAN_LIMITS": "{\"free\":{\"documents\":3,\"pushesPerDay\":30,\"htmlBytes\":1048576,\"storageBytes\":262144000},\"pro\":{\"documents\":500,\"pushesPerDay\":500,\"htmlBytes\":10485760,\"storageBytes\":5368709120,\"privateSharing\":true,\"comments\":true},\"pro_lifetime\":{\"documents\":500,\"pushesPerDay\":500,\"htmlBytes\":10485760,\"storageBytes\":5368709120,\"privateSharing\":true,\"comments\":true}}",
-
-    // Product analytics labels every event with this; business queries filter
-    // on it. A local run that turns delivery on must override it with
-    // `--var ANALYTICS_ENVIRONMENT:development`. The ingest key is a secret and
-    // POSTHOG_HOST defaults in code; see docs/analytics.md.
+    "PLAN_LIMITS": "{\"free\":{\"documents\":3,\"pushesPerDay\":30,\"htmlBytes\":1048576,\"storageBytes\":262144000},\"plus\":{\"documents\":500,\"pushesPerDay\":500,\"htmlBytes\":10485760,\"storageBytes\":5368709120,\"privateSharing\":true,\"comments\":true}}",
     "ANALYTICS_ENVIRONMENT": "production"
   }
 }
