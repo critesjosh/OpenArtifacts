@@ -141,6 +141,8 @@
   // altogether. Optional: a deployment without it sends no email and offers no
   // code sign-in, and Google and GitHub still work.
 
+  "send_email": [{ "name": "EMAIL", "allowed_sender_addresses": ["share@qart.cc"] }],
+
   // The Worker version that is running. A served page's validator carries its
   // deploy time (see `renderingSuffix` in src/serve.ts), so every deploy counts
   // as a new rendering of every page and a reader's next revalidation fetches
@@ -199,6 +201,7 @@
     "SERVING_HOST": "qart.cc",
     "API_HOST": "api.adjacentpossible.dev",
     "DEFAULT_PLAN": "free",
+    "EMAIL_FROM": "share@qart.cc",
     "PLAN_LIMITS": "{\"free\":{\"documents\":3,\"pushesPerDay\":30,\"htmlBytes\":1048576,\"storageBytes\":262144000},\"plus\":{\"documents\":500,\"pushesPerDay\":500,\"htmlBytes\":10485760,\"storageBytes\":5368709120,\"privateSharing\":true,\"comments\":true}}",
     "ANALYTICS_ENVIRONMENT": "production"
   }

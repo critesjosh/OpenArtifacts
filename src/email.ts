@@ -33,6 +33,9 @@ export async function emailRecipientHash(secret: string, address: string): Promi
  * reaching the sender. No message, address, code or exception text enters telemetry.
  * `sent` means accepted by Email Service, not delivered to an inbox.
  */
+/** Name shown as the sender and in message text. */
+const BRAND = "Qart";
+
 export async function sendEmail(
   env: Env,
   analytics: AnalyticsSink,
@@ -57,7 +60,7 @@ export async function sendEmail(
       } else {
         const prepared = await message();
         reason = "send_failed";
-        await env.EMAIL!.send({ from: { email: env.EMAIL_FROM!.trim(), name: "OpenArtifacts" }, to, ...prepared });
+        await env.EMAIL!.send({ from: { email: env.EMAIL_FROM!.trim(), name: BRAND }, to, ...prepared });
         outcome = "sent";
         reason = "accepted";
       }
@@ -98,9 +101,9 @@ function oneLine(text: string): string {
 
 export function codeMessage(code: string) {
   return {
-    subject: `${code} is your OpenArtifacts sign-in code`,
-    text: `Your OpenArtifacts sign-in code is ${code}.\n\nIt works for 10 minutes. If you did not ask for it, ignore this email.`,
-    html: `<p>Your OpenArtifacts sign-in code is <b>${code}</b>.</p><p>It works for 10 minutes. If you did not ask for it, ignore this email.</p>`,
+    subject: `${code} is your ${BRAND} sign-in code`,
+    text: `Your ${BRAND} sign-in code is ${code}.\n\nIt works for 10 minutes. If you did not ask for it, ignore this email.`,
+    html: `<p>Your ${BRAND} sign-in code is <b>${code}</b>.</p><p>It works for 10 minutes. If you did not ask for it, ignore this email.</p>`,
   };
 }
 
@@ -156,20 +159,17 @@ export function requestMessage(requesterAddress: string, title: string, shareUrl
   const name = oneLine(title);
   const requester = oneLine(requesterAddress);
   const nothing = "Nothing has been shared yet.";
-  const copilot = "Or open the note in Copilot and run Publish file to OpenArtifacts.";
   return {
     subject: `${requester} asked to open "${name}"`,
     text: [
       `${requester} asked to open "${name}".`,
       nothing,
       `Review request: ${shareUrl}`,
-      copilot,
     ].join("\n\n"),
     html: [
       `<p><b>${escapeHtml(requester)}</b> asked to open <b>${escapeHtml(name)}</b>.</p>`,
       `<p>${nothing}</p>`,
       `<p><a href="${escapeHtml(shareUrl)}">Review request</a></p>`,
-      `<p>${copilot}</p>`,
     ].join(""),
   };
 }
